@@ -24,14 +24,30 @@ class App extends Component {
         },
         {
           cod: 'pt',
-          lang: 'Protuguês'
+          lang: 'Português'
         },
       ],
       langFrom: '',
       langTo: '',
       text: '',
       textTranslated: '',
+      langs: {},
     }
+  }
+
+  async componentDidMount() {
+    const key = 'trnsl.1.1.20191119T204509Z.6e32edd1e93852e6.f2292421af3723c96aed48a7f6d9f05960884169';
+
+    const ui = 'pt'
+
+    const response = await api.get('/getLangs', {
+      params: {
+        key,
+        ui
+      }
+    })
+
+    this.setState({ langs: response.data.langs });
   }
 
   translate = async (e) => {
@@ -73,15 +89,22 @@ class App extends Component {
   }
 
   render() {
-    const { text, textTranslated, options, langFrom, langTo } = this.state;
+    const { text, textTranslated, langFrom, langTo, langs } = this.state;
     return (
       <div className="container">
         <form onSubmit={this.translate}>
           <div>
+            {/* <input className="autoComplete" list="langsFrom" name="langFrom" onChange={this.handleSelection} value={langFrom} />
+            <datalist id="langsFrom">
+              <option value="">Reconhecer</option>
+              {Object.keys(langs).map(key => (
+                <option key={key} value={key.toUpperCase()}>{langs[key]}</option>
+              ))}
+            </datalist> */}
             <select name="langFrom" onChange={this.handleSelection} value={langFrom}>
               <option value="">Reconhecer</option>
-              {options.map(option => (
-                <option key={option.cod} value={option.cod}>{option.lang}</option>
+              {Object.keys(langs).map(key => (
+                <option key={key} value={key}>{langs[key]}</option>
               ))}
             </select>
             <button type="button" onClick={this.changeLanguages}>
@@ -89,8 +112,8 @@ class App extends Component {
             </button>
             <select name="langTo" onChange={this.handleSelection} value={langTo} required>
               <option value=""></option>
-              {options.map(option => (
-                <option key={option.cod} value={option.cod}>{option.lang}</option>
+              {Object.keys(langs).map(key => (
+                <option key={key} value={key}>{langs[key]}</option>
               ))}
             </select>
             <button type="submit">Traduzir</button>
